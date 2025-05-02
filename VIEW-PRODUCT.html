@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <title>View Product</title>
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    window.onload = function() {
+      const params = new URLSearchParams(window.location.search);
+      document.getElementById('product-name').innerText = params.get('name');
+      document.getElementById('product-description').innerText = params.get('description');
+      document.getElementById('product-img').src = params.get('image');
+      document.getElementById('product-price').innerText = `৳${params.get('price')}`;
+    };
+  </script>
+</head>
+<body>
+  <header>
+    <div class="brand-name">Emil Fashion</div>
+  </header>
+  <div class="product-detail">
+    <img id="product-img" src="AKASH.jpg" alt="Product Image" class="product-img">
+    <h2 id="product-name"></h2>
+    <p id="product-description"></p>
+    <p id="product-price"></p>
+  </div>
+</body>
+</html>

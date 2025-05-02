@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <title>Cart</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .product {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin: 10px;
+      display: inline-block;
+      width: 200px;
+      text-align: center;
+    }
+    .product img { width: 100%; height: auto; }
+    .product input { margin-top: 5px; }
+
+    #confirmBtn {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      background: black;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>EMIL FASHION</h1>
+      <nav>
+       
+  </header>
+  
+  <div id="cartContainer"></div>
+
+  <label>
+  
+    <select id="deliverySelect">
+    
+    </select>
+  </label>
+
+  <button id="confirmBtn">Confirm & Buy Now</button>
+
+  <script>
+    const products = [];
+    for (let i = 1; i <= 35; i++) {
+      products.push({ name: `Heels ${i}`, price: 999, image: `image/AKASH${i}.jpg` });
+    }
+
+    const cartContainer = document.getElementById('cartContainer');
+    const deliverySelect = document.getElementById('deliverySelect');
+
+    // Render product selection
+    products.forEach((p, idx) => {
+      const d = document.createElement('div');
+      d.className = 'product';
+      d.innerHTML = `
+        <img src="${p.image}" alt="${p.name}">
+        <h3>${p.name}</h3>
+        <p>৳${p.price}</p>
+        <label><input type="checkbox" data-index="${idx}"> Select</label>
+      `;
+      cartContainer.appendChild(d);
+    });
+
+    document.getElementById('confirmBtn').onclick = () => {
+      const selected = [];
+      document.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => {
+        const idx = cb.dataset.index;
+        const p = products[idx];
+
+        selected.push({
+          name: p.name,
+          price: p.price,
+          image: p.image,
+          quantity: 1,
+          size: 35,
+          total: p.price
+        });
+      });
+
+      if (!selected.length) {
+        alert('কমপক্ষে একটি পণ্য সিলেক্ট করুন।');
+        return;
+      }
+
+      localStorage.setItem('selectedProducts', JSON.stringify(selected));
+      const delivery = deliverySelect.value;
+      const url = `buy-summary.html?delivery=${delivery}`;
+      window.open(url, '_blank');
+    };
+  </script>
+</body>
+</html>

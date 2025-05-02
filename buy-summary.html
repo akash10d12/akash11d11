@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <title>Buy Summary</title>
+  <link rel="stylesheet" href="styles.css">
+
+  <style>
+    .product {
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin: 10px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .product img {
+      width: 100px;
+      margin-right: 15px;
+    }
+    .product-info {
+      flex-grow: 1;
+    }
+    #totalPrice {
+      font-size: 1.2em;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+    #summaryOutput {
+      margin-top: 30px;
+      padding: 15px;
+      border: 1px solid #aaa;
+      background: #f9f9f9;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Emil fashion</h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="about.html">About us</a>
+    </nav>
+  </header>
+  <h1>নির্বাচিত পণ্যের প্রিভিউ</h1>
+  <div id="productList"></div>
+
+  <label>
+    ডেলিভারি চার্জ:
+    <select id="deliverySelect">
+      <option value="80">ঢাকার ভিতরে - ৮০৳</option>
+      <option value="150">ঢাকার বাইরে - ১৫০৳</option>
+    </select>
+  </label>
+
+  <h2 id="totalPrice">মোট দাম: ৳0</h2>
+
+  <div id="customerDetails">
+    <h3>আপনার তথ্য দিন:</h3>
+    <label>নাম:</label>
+    <input type="text" id="customerName" placeholder="আপনার নাম লিখুন">
+    
+    <label>ঠিকানা:</label>
+    <textarea id="customerAddress" placeholder="আপনার ঠিকানা লিখুন"></textarea>
+    
+    <label>মোবাইল নম্বর:</label>
+    <input type="text" id="customerPhone" placeholder="মোবাইল নম্বর দিন">
+    
+    <button id="confirmBtn">Confirm</button>
+  </div>
+  
+
+  <div id="summaryOutput"></div>
+
+  <script>
+    const selectedProducts = JSON.parse(localStorage.getItem('selectedProducts') || '[]');
+    const deliveryFee = parseInt(new URLSearchParams(window.location.search).get('delivery')) || 0;
+
+    const productList = document.getElementById('productList');
+    const totalPriceEl = document.getElementById('totalPrice');
+    const deliverySelect = document.getElementById('deliverySelect');
+    const summaryOutput = document.getElementById('summaryOutput');
+    deliverySelect.value = deliveryFee;
+
+    function renderProducts() {
+      productList.innerHTML = '';
+      selectedProducts.forEach((product, index) => {
+        const div = document.createElement('div');
+        div.className = 'product';
+
+        const img = document.createElement('img');
+        img.src = product.image;
+
+        const infoDiv = document.createElement('div');
+        infoDiv.className = 'product-info';
+
+        const title = document.createElement('h3');
+        title.textContent = product.name;
+
+        const sizeSelect = document.createElement('select');
+        for (let s = 35; s <= 43; s++) {
+          const opt = document.createElement('option');
+          opt.value = s;
+          opt.textContent = `Size ${s}`;
+          if (product.size == s) opt.selected = true;
+          sizeSelect.appendChild(opt);
+        }
+        sizeSelect.onchange = () => {
+          selectedProducts[index].size = sizeSelect.value;
+        };
+
+        const qtyInput = document.createElement('input');
+        qtyInput.type = 'number';
+        qtyInput.min = 1;
+        qtyInput.value = product.quantity;
+        qtyInput.style.width = '60px';
+        qtyInput.oninput = () => {
+          const qty = parseInt(qtyInput.value);
+          selectedProducts[index].quantity = qty;
+          selectedProducts[index].total = qty * product.price;
+          priceBox.textContent = `৳${selectedProducts[index].total}`;
+          updateTotal();
+        };
+
+        const priceBox = document.createElement('div');
+        priceBox.textContent = `৳${product.price * product.quantity}`;
+
+        infoDiv.appendChild(title);
+        infoDiv.appendChild(document.createTextNode('Size: '));
+        infoDiv.appendChild(sizeSelect);
+        infoDiv.appendChild(document.createElement('br'));
+        infoDiv.appendChild(document.createTextNode('Quantity: '));
+        infoDiv.appendChild(qtyInput);
+
+        div.appendChild(img);
+        div.appendChild(infoDiv);
+        div.appendChild(priceBox);
+
+        productList.appendChild(div);
+      });
+    }
+
+    function updateTotal() {
+      const delivery = parseInt(deliverySelect.value);
+      const subtotal = selectedProducts.reduce((sum, p) => sum + (p.price * p.quantity), 0);
+      totalPriceEl.textContent = `মোট দাম: ৳${subtotal + delivery}`;
+    }
+
+    deliverySelect.addEventListener('change', updateTotal);
+
+    document.getElementById('confirmBtn').onclick = () => {
+      const name = document.getElementById('customerName').value.trim();
+      const address = document.getElementById('customerAddress').value.trim();
+      const phone = document.getElementById('customerPhone').value.trim();
+
+      if (!name || !address || !phone) {
+        alert('দয়া করে নাম, ঠিকানা ও ফোন নম্বর পূরণ করুন।');
+        return;
+      }
+
+      let html = `<h3>Order Summary:</h3>`;
+      html += `<p><strong>নাম:</strong> ${name}</p>`;
+      html += `<p><strong>ঠিকানা:</strong> ${address}</p>`;
+      html += `<p><strong>মোবাইল:</strong> ${phone}</p><hr>`;
+      html += `<h4>প্রোডাক্ট তালিকা:</h4>`;
+
+      selectedProducts.forEach(p => {
+        const total = p.price * p.quantity;
+        html += `<p>${p.name} | Size: ${p.size} | Qty: ${p.quantity} | ৳${total}</p>`;
+      });
+
+      const delivery = parseInt(deliverySelect.value);
+      const total = selectedProducts.reduce((sum, p) => sum + (p.price * p.quantity), 0) + delivery;
+
+      html += `<hr><strong>ডেলিভারি চার্জ:</strong> ৳${delivery}`;
+      html += `<br><strong>মোট মূল্য:</strong> ৳${total}`;
+
+      summaryOutput.innerHTML = html;
+    };
+
+    renderProducts();
+    updateTotal();
+  </script>
+</body>
+</html>

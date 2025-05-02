@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <title>View Product</title>
+  <script>
+    window.onload = function () {
+      const params = new URLSearchParams(window.location.search);
+      document.getElementById('product-name').innerText = params.get('name');
+      document.getElementById('product-description').innerText = params.get('description');
+      document.getElementById('product-img').src = params.get('image');
+    };
+  </script>
+</head>
+<body>
+  <h1 id="product-name"></h1>
+  <img id="image" src="" alt="Product Image">
+  <p id="product-description"></p>
+</body>
+</html>

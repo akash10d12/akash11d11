@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <title>Buy Now</title>
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    function updatePrice() {
+      const quantity = parseInt(document.getElementById('quantity').value) || 1;
+      const basePrice = parseFloat(document.getElementById('price').value);
+      const deliveryFee = parseInt(document.querySelector('input[name="delivery"]:checked')?.value || 0);
+      const total = (basePrice * quantity) + deliveryFee;
+      document.getElementById('total-price').innerText = `মোট: ৳${total}`;
+    }
+
+    function validateForm() {
+      const name = document.getElementById('cname').value.trim();
+      const address = document.getElementById('address').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const size = document.getElementById('size').value;
+
+      if (!name || !address || !phone || !size) {
+        alert("সব তথ্য পূরণ করুন।");
+        return false;
+      }
+
+      const total = document.getElementById('total-price').innerText;
+      alert(`অর্ডার নিশ্চিত হয়েছে:\nনাম: ${name}\nঠিকানা: ${address}\nফোন: ${phone}\nসাইজ: ${size}\n${total}`);
+      return false;
+    }
+
+    window.onload = function () {
+      // Dummy product details
+      const image = "image/AKASH33.jpg";
+      const name = "Elegant Heels";
+      const price = 999;
+
+      document.getElementById('product-img').src = image;
+      document.getElementById('product-name').innerText = name;
+      document.getElementById('price').value = price;
+
+      updatePrice();
+    };
+  </script>
+</head>
+<body>
+
+  <header>
+    <h1>Emil fashion</h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="about.html">About us</a>
+    </nav>
+  </header>
+
+  <main>
+    <img id="product-img" src="" alt="পণ্য ছবি" width="200"><br>
+    <h2 id="product-name"></h2>
+
+    <label>Quantity:
+      <input type="number" id="quantity" value="1" min="1" onchange="updatePrice()">
+    </label>
+    <input type="hidden" id="price">
+
+    <h3>ডেলিভারি:</h3>
+    <label><input type="radio" name="delivery" value="80" checked onchange="updatePrice()"> ঢাকার ভিতরে (৳80)</label><br>
+    <label><input type="radio" name="delivery" value="150" onchange="updatePrice()"> ঢাকার বাইরে (৳150)</label>
+
+    <h3>আপনার তথ্য</h3>
+    <form onsubmit="return validateForm()">
+      <label>নাম: <input type="text" id="cname" required></label><br>
+      <label>ঠিকানা: <input type="text" id="address" required></label><br>
+      <label>ফোন নম্বর: <input type="text" id="phone" required></label><br>
+      <label>সাইজ: 
+        <select id="size" required onchange="updatePrice()">
+          <option value="">সিলেক্ট করুন</option>
+          <option>35</option>
+          <option>36</option>
+          <option>37</option>
+          <option>38</option>
+          <option>39</option>
+          <option>40</option>
+          <option>41</option>
+          <option>42</option>
+          <option>43</option>
+        </select>
+      </label><br>
+
+      <p id="total-price">মোট: ৳0</p>
+
+      <button type="submit">Confirm</button>
+    </form>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 EMIL FASHION. All rights reserved</p>
+  </footer>
+
+</body>
+</html>
